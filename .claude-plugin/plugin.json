@@ -9,5 +9,6 @@
   "homepage": "https://clonvo.com/docs",
   "repository": "https://github.com/clonvodotcom/skills",
   "privacyPolicyUrl": "https://clonvo.com/privacy",
-  "icon": ".claude-plugin/icon.png"
+  "icon": ".claude-plugin/icon.png",
+  "license": "MIT"
 }

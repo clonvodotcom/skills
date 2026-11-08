@@ -50,3 +50,7 @@ gh skill install clonvodotcom/skills
 ## Docs
 
 Every Clonvo docs page is available as Markdown for agents: start at [clonvo.com/llms.txt](https://clonvo.com/llms.txt).
+
+## License
+
+[MIT](LICENSE)
