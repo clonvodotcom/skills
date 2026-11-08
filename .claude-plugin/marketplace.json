@@ -1,0 +1,16 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "clonvo",
+  "description": "Clonvo's agent skills and MCP server for Claude Code",
+  "owner": {
+    "name": "Clonvo",
+    "url": "https://clonvo.com"
+  },
+  "plugins": [
+    {
+      "name": "clonvo",
+      "source": "./",
+      "description": "Skills for Clonvo, one OpenAI-compatible API for every model"
+    }
+  ]
+}

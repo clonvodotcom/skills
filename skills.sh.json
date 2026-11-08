@@ -1,0 +1,16 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Build",
+      "description": "Skills for writing code that calls Clonvo",
+      "skills": ["clonvo", "clonvo-migrate"]
+    },
+    {
+      "title": "Tasks",
+      "description": "Skills for using Clonvo from your agent",
+      "skills": ["clonvo-models", "clonvo-web-tools"]
+    }
+  ]
+}

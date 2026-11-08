@@ -1,0 +1,13 @@
+{
+  "name": "clonvo",
+  "description": "Skills for Clonvo, one OpenAI-compatible API for every model: building with the API, choosing models, migrating from OpenAI or OpenRouter, and web search and scraping tools",
+  "version": "1.0.0",
+  "author": {
+    "name": "Clonvo",
+    "url": "https://clonvo.com"
+  },
+  "homepage": "https://clonvo.com/docs",
+  "repository": "https://github.com/clonvodotcom/skills",
+  "privacyPolicyUrl": "https://clonvo.com/privacy",
+  "icon": ".claude-plugin/icon.png"
+}
