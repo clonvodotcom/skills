@@ -1,31 +1,40 @@
 ---
 name: clonvo
-description: "Call OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models through Clonvo's one OpenAI-compatible API, with fallback models and web_search/web_scrape tools for agents (REST or MCP). Use when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or a sk-cv-v1- key, or wants one API key for many LLM providers, model fallbacks, or web search and scraping tools in their app or agent."
+description: "Build apps and agents on Clonvo, one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models: chat completions, the Responses API, embeddings, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and web_search/web_scrape tools over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
+metadata:
+  author: Clonvo
+  version: "1.0.0"
+  docs: "https://clonvo.com/llms.txt"
 ---
 
-# Clonvo
+# Build with Clonvo
 
-Clonvo is an OpenAI-compatible API for models from OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral, Moonshot (Kimi) and Meta, plus `web_search` and `web_scrape` tools for agents. One API key covers every model; switching models means changing the `model` string.
+Clonvo is an OpenAI-compatible API in front of OpenAI, Anthropic, Google (Gemini), xAI (Grok), DeepSeek, Mistral, Moonshot (Kimi) and Meta (Muse) models. Code written for the OpenAI SDK works by changing the base URL, the key and the model id. Clonvo translates requests for providers that don't speak OpenAI's format and returns OpenAI-shaped responses.
 
-- Base URL: `https://api.clonvo.com/v1`
-- Auth: `Authorization: Bearer $CLONVO_API_KEY` (keys look like `sk-cv-v1-` followed by 64 hex characters)
-- Docs for agents: https://clonvo.com/llms.txt (index) and https://clonvo.com/llms-full.txt (everything). Every docs page is Markdown at its URL plus `.md`, e.g. https://clonvo.com/docs/fallbacks.md
-- Live model list with prices and capabilities, no key needed: `GET https://api.clonvo.com/v1/models`
+## Scope
 
-Read the docs page for anything this file doesn't cover. Don't guess model ids, prices or limits: they change, and the live endpoints are the source of truth.
+- Chat Completions: `POST /v1/chat/completions` (the default for new work)
+- Responses API: `POST /v1/responses`, stateless; also runs the OpenAI Agents SDK
+- Embeddings: `POST /v1/embeddings`
+- Web tools for agents: `web_search` and `web_scrape`, over REST (`POST /v1/tools/{id}`) or MCP (`https://api.clonvo.com/mcp`)
+- Read-only endpoints: `GET /v1/models` (public), `GET /v1/key`, `GET /v1/credits`, `GET /v1/generation?id=`
+
+Not available: OpenAI's Images, Audio, Files, Batch and Assistants APIs (they return `404 unknown_endpoint`).
 
 ## Setup
 
-1. The user signs up at https://clonvo.com, creates a key under **API keys** (shown once), and sets it as an environment variable:
-   ```bash
-   export CLONVO_API_KEY="sk-cv-v1-…"
-   ```
-2. Never hard-code the key, commit it, or put it in browser or mobile code. Read it from the environment.
-3. Paid models need credits. On the Free plan, paid models return `402 insufficient_credits`; free models (ids ending in `:free`) work once an owner or admin turns on **Use free models** in **Settings → Privacy**.
+```bash
+export CLONVO_API_KEY="sk-cv-v1-…"   # created under API keys in the Clonvo dashboard; shown once
+```
 
-## Make a request
+- Base URL: `https://api.clonvo.com/v1`
+- Auth: `Authorization: Bearer $CLONVO_API_KEY` (`X-Api-Key` also works)
+- Read the key from the environment. Never hard-code it, commit it, or ship it in browser or mobile code; call Clonvo from a server.
+- Plans gate features. On Free, only `:free` models work, and `models` or `provider` in a request return `402 plan_feature_unavailable`. Any credit purchase moves the organization to Pay as you go, which unlocks every model, fallbacks, your own provider keys and the web tools.
 
-Use the official OpenAI SDK with Clonvo's base URL. Nothing else changes.
+## The recommended request
+
+Use the official OpenAI SDK with Clonvo's base URL, a canonical model id, and nothing else unless the task needs it:
 
 ```python
 import os
@@ -51,100 +60,73 @@ const completion = await client.chat.completions.create({
 });
 ```
 
-Streaming, tool calling, structured outputs (`response_format`), reasoning (`reasoning_effort`), images and files work with the same request shape for every provider. `POST /v1/responses` (OpenAI's Responses API, stateless) and `POST /v1/embeddings` are also available.
-
-The response is a standard Chat Completions object, plus:
-- `model`: the canonical id of the model that answered
-- `provider`: the provider that served it
-- `usage.cost`: the cost in USD at the provider's list price
-
-## Model ids
-
-- Format: `author/slug`, for example `anthropic/claude-sonnet-5-5`, `openai/gpt-6.1-sol`, `google/gemini-3.8-flash`, `x-ai/grok-4-7`. These are examples; get current ids from `GET /v1/models`.
-- Authors: `openai`, `anthropic`, `google`, `x-ai`, `deepseek`, `mistralai`, `moonshotai`, `meta`. They match OpenRouter's, so OpenRouter ids usually work unchanged.
-- Clonvo also accepts author aliases (`xai`, `gemini`, `mistral`, `moonshot`, `kimi`), bare slugs (`grok-4-7`), `.` for `-`, and any letter case. Use the canonical id in code.
-- `:free` ids route to OpenRouter's free endpoints, with low rate limits and their own data terms. List them with:
-  ```bash
-  curl -s https://api.clonvo.com/v1/models | jq -r '.data[].id | select(endswith(":free"))'
-  ```
-- An unknown id returns `400 model_not_found`. A retired model returns `404 model_retired`.
-
-## Fallback models
-
-Pay as you go and above. Add `models` (up to 5) and Clonvo tries `model` first, then each fallback in order, on rate limits (`429`), server errors, timeouts and unavailable models. Invalid requests (`400`) are returned straight away and not retried. Only the attempt that answered is charged.
-
-```python
-completion = client.chat.completions.create(
-    model="anthropic/claude-sonnet-5-5",
-    messages=messages,
-    extra_body={"models": ["openai/gpt-6.1-sol", "google/gemini-3.8-flash"]},
-)
-print(completion.model)  # the model that answered
-```
-
-In TypeScript, pass `models` in the request body (the OpenAI SDK's types don't include it, so add `// @ts-expect-error Clonvo extension`).
-
-The user's own provider keys, added under **Provider keys**, are used before credits. `provider: { order: ["byok"] | ["credits"], allow_fallbacks: false }` restricts one request to one kind. Details: https://clonvo.com/docs/fallbacks.md
-
-## Web tools for agents
-
-Pay as you go and above. `web_search` finds pages; `web_scrape` reads one page as Markdown or text. They run on the user's own Firecrawl, Tavily, Exa, Parallel or TinyFish key if added, otherwise on Clonvo credits.
-
-**Over MCP** (Streamable HTTP, API key in the header; no OAuth):
-
 ```bash
-claude mcp add --transport http clonvo https://api.clonvo.com/mcp \
-  --header "Authorization: Bearer $CLONVO_API_KEY"
-```
-
-For a shared project config, commit this `.mcp.json` and have each person set `CLONVO_API_KEY` themselves:
-
-```json
-{
-  "mcpServers": {
-    "clonvo": {
-      "type": "http",
-      "url": "https://api.clonvo.com/mcp",
-      "headers": { "Authorization": "Bearer ${CLONVO_API_KEY}" }
-    }
-  }
-}
-```
-
-Cursor, the OpenAI Agents SDK and the AI SDK setups are at https://clonvo.com/docs/mcp.md
-
-**Over REST**:
-
-```bash
-curl https://api.clonvo.com/v1/tools/web_search \
+curl https://api.clonvo.com/v1/chat/completions \
   -H "Authorization: Bearer $CLONVO_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"arguments": {"query": "PostgreSQL 18 release notes", "max_results": 3}}'
+  -d '{"model": "anthropic/claude-sonnet-5-5", "messages": [{"role": "user", "content": "Summarise this ticket…"}]}'
 ```
 
-- `GET /v1/tools` returns each tool's JSON Schema (`input_schema`), which is a valid function `parameters` object for tool calling.
-- `web_search` arguments: `query` (required), `max_results` (1–20), `include_domains`, `exclude_domains`, `time_range` (`day`/`week`/`month`/`year`), `include_content`, `max_content_chars`.
-- `web_scrape` arguments: `url` (required), `format` (`markdown`/`text`), `only_main_content`, `max_chars`.
-- Results are in `result`; cost is in `usage`.
+The response is a standard Chat Completions object plus three things worth using:
 
-Details: https://clonvo.com/docs/tools.md
+- `model`: the canonical id of the model that answered (it can differ from what you sent: aliases resolve, and a fallback may answer)
+- `provider`: the provider that served it
+- `usage.cost`: the cost in USD at list price (`usage.is_byok` is `true` when the user's own provider key served it)
 
-## Errors
+The id `gen-…` is also in the `x-clonvo-generation-id` header, for `GET /v1/generation?id=`.
 
-Errors use OpenAI's shape (`error.message`, `type`, `code`, `param`), so the OpenAI SDKs raise their usual exceptions. Model, embeddings and tool responses carry an `x-clonvo-generation-id` header, errors included, for looking a request up with `GET /v1/generation`.
+Model ids in these examples are real today, but the catalogue changes. Get current ids from `GET https://api.clonvo.com/v1/models` (no key needed) or the `clonvo-models` skill. Never invent an id.
 
-| Status | Meaning | What to do |
-| --- | --- | --- |
-| `400` | Invalid request: unknown model id, unsupported parameter or content | Fix the request; check the id with `GET /v1/models` |
-| `401` | Missing, invalid, revoked or expired key | Check `CLONVO_API_KEY` |
-| `402` | Out of credits, the key's spending limit, or a feature not on the plan (`plan_feature_unavailable` for `models`/`provider` on Free) | The user buys credits or raises the key's limit; read `error.code` |
-| `403` | Free models are off, or their terms need accepting | An owner or admin enables them in **Settings → Privacy** |
-| `404` | Model retired or temporarily unavailable | Pick another model, or add fallbacks |
-| `429` | Rate limited | Back off and retry, or add fallbacks |
-| `5xx` | Provider error, overload or timeout | Retry, ideally with fallback models |
+## Decide what to use
 
-Full list: https://clonvo.com/docs/errors.md
+1. Text or multimodal generation in an app: Chat Completions. See [references/chat-completions.md](references/chat-completions.md).
+2. Code already on the Responses API or the OpenAI Agents SDK: `/v1/responses`, sending the whole conversation every turn. See [references/responses-api.md](references/responses-api.md).
+3. A request must survive a provider outage or rate limit: add fallback `models`. See [references/routing-and-billing.md](references/routing-and-billing.md).
+4. Picking a model by price, context, or capability (tools, vision, reasoning, structured outputs): query `GET /v1/models`. See [references/models.md](references/models.md).
+5. An agent or LLM needs web search or page reading: Clonvo's web tools, over MCP if the framework speaks it, otherwise REST. See [references/web-tools.md](references/web-tools.md).
+6. Vectors for search or RAG: `/v1/embeddings` with an embedding model. See [references/embeddings.md](references/embeddings.md).
+7. Moving an app from OpenAI or OpenRouter: see the `clonvo-migrate` skill or [references/sdks-and-frameworks.md](references/sdks-and-frameworks.md).
+8. A request failed or cost more than expected: read the error code, then look the request up. See [references/errors.md](references/errors.md).
 
-## Pricing
+## Critical pitfalls
 
-Tokens cost the provider's list price on every plan; Clonvo charges a fee on credit purchases. Current plans and fees: https://clonvo.com/pricing.md. Per-model prices: `GET /v1/models` or https://clonvo.com/models.md
+- Don't guess model ids or add version suffixes from memory. Copy them from `GET /v1/models`. An unknown id returns `400 model_not_found`, and one unknown id in `models` fails the whole request.
+- Clonvo extensions (`models`, `provider`, `reasoning`, `top_k`) go in `extra_body` with the Python SDK. In TypeScript they're sent as extra properties; add `// @ts-expect-error Clonvo extension` above them.
+- `provider.order` accepts only `"byok"` and `"credits"`. It chooses between the user's own provider keys and Clonvo credits, not between upstream providers like OpenRouter's does. Other entries are ignored.
+- `models` and `provider` need Pay as you go or above. On Free they return `402 plan_feature_unavailable`, not a silent no-op.
+- Fallbacks happen only before the first streamed chunk, and never for `400` errors (an unsupported parameter, or a prompt longer than the model's context).
+- The final streaming chunk has an empty `choices` array and carries `usage`. Check `choices` before indexing it. A stream that fails mid-way ends with `finish_reason: "error"` and an `error` object, with HTTP status already `200`.
+- `n` must be `1`. Send separate requests for several completions.
+- The Responses API is stateless. `previous_response_id`, `conversation` and `background` return `400 unsupported_parameter`. Resend the earlier input plus the previous `output` items every turn.
+- Files go inline as base64 `file_data`. There's no upload API, and `file_id` returns `400`.
+- Sending a content part a model can't take (an image to a text-only model, a PDF to a provider without file input) returns `400 unsupported_content`. Check the model's `architecture.input_modalities` first.
+- `tool_choice` values a model can't honour become `auto` instead of failing. Check the response for `tool_calls` rather than assuming one was made.
+- Don't retry `400`, `401`, `402`, `403` or `404`; the same request fails again. Retry `429` and `5xx` with backoff and respect `Retry-After`.
+- Free models (`:free`) need an owner or admin to turn them on in **Settings → Privacy** (otherwise `403 training_providers_not_allowed`). Their prompts may be stored and used for training, so never send confidential data to them.
+
+More: [references/common-mistakes.md](references/common-mistakes.md).
+
+## Reference files
+
+| File | Topics |
+| --- | --- |
+| [references/chat-completions.md](references/chat-completions.md) | Parameters, extensions, response fields, streaming, tool calling, structured outputs, reasoning, images, PDFs and audio, prompt caching |
+| [references/responses-api.md](references/responses-api.md) | Stateless Responses API, conversation replay, function calling, OpenAI Agents SDK |
+| [references/models.md](references/models.md) | Model id format, aliases, free models, `GET /v1/models` fields, choosing by capability and price, peak-hour prices |
+| [references/routing-and-billing.md](references/routing-and-billing.md) | Fallback models, own provider keys, `provider.order`, data collection, cost, credits, spending limits, plans |
+| [references/web-tools.md](references/web-tools.md) | `web_search` and `web_scrape` over REST and MCP, arguments, giving them to a model, provider routing, tool errors |
+| [references/embeddings.md](references/embeddings.md) | Embedding models, request and response, dimensions, framework notes |
+| [references/sdks-and-frameworks.md](references/sdks-and-frameworks.md) | OpenAI Python and Node SDKs, environment variables, Vercel AI SDK, LangChain, OpenRouter-style clients, app attribution |
+| [references/errors.md](references/errors.md) | Error shape, every status and code, retry policy, looking up a request, checking a key and credits |
+| [references/common-mistakes.md](references/common-mistakes.md) | Wrong-to-right corrections for the mistakes agents make most |
+
+## Canonical docs
+
+Every docs page is Markdown at its URL plus `.md`. When this skill and the docs disagree, the docs win.
+
+- Index for agents: https://clonvo.com/llms.txt
+- Everything in one file: https://clonvo.com/llms-full.txt
+- Quickstart: https://clonvo.com/docs/quickstart.md
+- Chat completions reference: https://clonvo.com/docs/chat-completions.md
+- Model catalogue: https://clonvo.com/models.md
+- Pricing and plans: https://clonvo.com/pricing.md
