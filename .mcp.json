@@ -2,10 +2,7 @@
   "mcpServers": {
     "clonvo": {
       "type": "http",
-      "url": "https://api.clonvo.com/mcp",
-      "headers": {
-        "Authorization": "Bearer ${CLONVO_API_KEY}"
-      }
+      "url": "https://api.clonvo.com/mcp"
     }
   }
 }

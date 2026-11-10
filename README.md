@@ -2,12 +2,12 @@
 
 [![skills.sh](https://skills.sh/b/clonvodotcom/skills)](https://skills.sh/clonvodotcom/skills)
 
-[Agent Skills](https://agentskills.io) for [Clonvo](https://clonvo.com), one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models, with fallbacks, your own provider keys, and web search and scraping tools for agents.
+[Agent Skills](https://agentskills.io) for [Clonvo](https://clonvo.com), one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models, with fallbacks, your own provider keys, and tools for agents: web search and scraping, crawls, research, a browser agent, and company and people data.
 
 They work with any agent that supports skills, including Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, Windsurf and OpenCode.
 
 > [!NOTE]
-> You need a Clonvo API key. Create one in the [Clonvo dashboard](https://clonvo.com) and set it as `CLONVO_API_KEY` in your agent's environment.
+> Skills that call the API need a Clonvo API key. Create one in the [Clonvo dashboard](https://clonvo.com) and set it as `CLONVO_API_KEY` in your agent's environment. The MCP server lets you sign in instead.
 
 ## Skills
 
@@ -34,12 +34,14 @@ npx skills add clonvodotcom/skills --skill clonvo
 
 ### Claude Code plugin
 
-The plugin installs every skill and connects [Clonvo's MCP server](https://github.com/clonvodotcom/mcp) (web search, scraping, crawling, research, a browser agent, and company and people data) using `CLONVO_API_KEY` from your environment:
+The plugin installs every skill and connects [Clonvo's MCP server](https://github.com/clonvodotcom/mcp) (web search, scraping, crawling, research, a browser agent, and company and people data):
 
 ```
 /plugin marketplace add clonvodotcom/skills
 /plugin install clonvo@clonvo
 ```
+
+Then run `/mcp` and choose **Authenticate** for `clonvo` to sign in. To use an API key instead, see [the MCP server's setup](https://github.com/clonvodotcom/mcp#claude-code).
 
 ### GitHub CLI
 

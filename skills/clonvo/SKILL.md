@@ -1,9 +1,9 @@
 ---
 name: clonvo
-description: "Build apps and agents on Clonvo, one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models: chat completions, the Responses API, embeddings, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and web_search/web_scrape tools over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
+description: "Build apps and agents on Clonvo, one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models: chat completions, the Responses API, embeddings, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and tools for agents (web search and scraping, crawls, research, a browser agent, company and people data) over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
 metadata:
   author: Clonvo
-  version: "1.0.0"
+  version: "1.1.0"
   docs: "https://clonvo.com/llms.txt"
 ---
 
@@ -16,7 +16,7 @@ Clonvo is an OpenAI-compatible API in front of OpenAI, Anthropic, Google (Gemini
 - Chat Completions: `POST /v1/chat/completions` (the default for new work)
 - Responses API: `POST /v1/responses`, stateless; also runs the OpenAI Agents SDK
 - Embeddings: `POST /v1/embeddings`
-- Web tools for agents: `web_search` and `web_scrape`, over REST (`POST /v1/tools/{id}`) or MCP (`https://api.clonvo.com/mcp`)
+- Tools for agents: web search and scraping, site maps and crawls, structured extraction, cited answers, research reports, a browser agent, and company and people data, over REST (`POST /v1/tools/{id}`) or MCP (`https://api.clonvo.com/mcp`, sign in with OAuth or use an API key)
 - Read-only endpoints: `GET /v1/models` (public), `GET /v1/key`, `GET /v1/credits`, `GET /v1/generation?id=`
 
 Not available: OpenAI's Images, Audio, Files, Batch and Assistants APIs (they return `404 unknown_endpoint`).
@@ -114,7 +114,7 @@ More: [references/common-mistakes.md](references/common-mistakes.md).
 | [references/responses-api.md](references/responses-api.md) | Stateless Responses API, conversation replay, function calling, OpenAI Agents SDK |
 | [references/models.md](references/models.md) | Model id format, aliases, free models, `GET /v1/models` fields, choosing by capability and price, peak-hour prices |
 | [references/routing-and-billing.md](references/routing-and-billing.md) | Fallback models, own provider keys, `provider.order`, data collection, cost, credits, spending limits, plans |
-| [references/web-tools.md](references/web-tools.md) | `web_search` and `web_scrape` over REST and MCP, arguments, giving them to a model, provider routing, tool errors |
+| [references/web-tools.md](references/web-tools.md) | Every tool, `web_search` and `web_scrape` in detail, REST and MCP (OAuth or API key), long-running jobs, giving tools to a model, provider routing, tool errors |
 | [references/embeddings.md](references/embeddings.md) | Embedding models, request and response, dimensions, framework notes |
 | [references/sdks-and-frameworks.md](references/sdks-and-frameworks.md) | OpenAI Python and Node SDKs, environment variables, Vercel AI SDK, LangChain, OpenRouter-style clients, app attribution |
 | [references/errors.md](references/errors.md) | Error shape, every status and code, retry policy, looking up a request, checking a key and credits |

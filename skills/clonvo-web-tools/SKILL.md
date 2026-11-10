@@ -3,24 +3,34 @@ name: clonvo-web-tools
 description: "Search the web and read web pages through Clonvo's web_search and web_scrape tools, using the Clonvo MCP server's tools when connected or Clonvo's REST API with CLONVO_API_KEY otherwise. Use when a task needs current information, sources, facts past your training data, or the contents of a URL, and the user has a Clonvo API key or the Clonvo MCP server connected."
 metadata:
   author: Clonvo
-  version: "1.0.0"
+  version: "1.1.0"
   docs: "https://clonvo.com/docs/tools.md"
 ---
 
 # Clonvo web tools
 
-Two tools: `web_search` (find pages) and `web_scrape` (read one page). They run on the user's own Firecrawl, Tavily, Exa, Parallel or TinyFish key if their organization added one, otherwise on Clonvo credits. They need Pay as you go or above.
+This skill covers `web_search` (find pages) and `web_scrape` (read one page). They run on the user's own Firecrawl, Tavily, Exa, Parallel or TinyFish key if their organization added one, otherwise on Clonvo credits. They need Pay as you go or above.
+
+The Clonvo MCP server has more tools, such as `web_map`, `web_extract`, `web_answer`, `web_crawl`, `web_research`, `browser_task`, and company and people lookups. Use them when they fit the task better; their descriptions in your tool list say when.
 
 ## Which way to call them
 
 1. If your tool list has `web_search` and `web_scrape` from the Clonvo MCP server (often prefixed, such as `mcp__clonvo__web_search`), use them.
 2. Otherwise, if `CLONVO_API_KEY` is set, call the REST API with `curl` (below).
-3. Otherwise, tell the user how to connect, and stop:
+3. Otherwise, tell the user how to connect, and stop. Signing in needs no key:
 
 ```bash
-export CLONVO_API_KEY="sk-cv-v1-…"   # from the Clonvo dashboard, API keys
+claude mcp add --transport http clonvo https://api.clonvo.com/mcp   # then /mcp → Authenticate
+```
+
+Or with an API key from the Clonvo dashboard:
+
+```bash
+export CLONVO_API_KEY="sk-cv-v1-…"
 claude mcp add --transport http clonvo https://api.clonvo.com/mcp --header "Authorization: Bearer $CLONVO_API_KEY"
 ```
+
+Other clients: https://github.com/clonvodotcom/mcp
 
 Never print the key or put it in a URL.
 

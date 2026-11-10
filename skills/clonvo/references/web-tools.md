@@ -1,6 +1,20 @@
 # Web tools
 
-`web_search` finds pages; `web_scrape` reads one page as Markdown or text. Same Clonvo key as models. Pay as you go and above (`402` on Free).
+`web_search` finds pages; `web_scrape` reads one page as Markdown or text. Same Clonvo key as models. Pay as you go and above (`402` on Free); any credit purchase moves an organization there.
+
+The same API and MCP server also have:
+
+| Tool | Does |
+| --- | --- |
+| `web_map` | List a site's URLs |
+| `web_extract` | Typed JSON from one page, shaped by your JSON Schema |
+| `web_answer` | Short answer from current sources, with citations |
+| `find_similar` | Pages similar to a URL |
+| `company_search`, `company_enrich`, `company_news`, `company_jobs`, `company_similar` | Company data |
+| `people_search`, `people_enrich` | Professional profiles |
+| `web_crawl`, `web_research`, `browser_task` | Long-running: crawl a site, a cited research report, a browser agent working toward a goal. They run as jobs |
+
+`GET /v1/tools` lists every tool with its `input_schema`. Jobs: REST returns a job to poll at `GET /v1/tools/jobs/{id}`; over MCP, clients that support tasks get one, others get a job id for the free `job_status` tool.
 
 Calls run on the organization's own Firecrawl, Tavily, Exa, Parallel or TinyFish key when one is added under **Provider keys → Tools**; otherwise on Clonvo credits through treg (the call's cost plus 2%). Own keys are always tried first.
 
@@ -86,21 +100,29 @@ Return tool errors to the model as the tool result (as above) so it can adapt, r
 
 ## MCP
 
-Remote server, Streamable HTTP, stateless, API key in the header (no OAuth):
+Remote server, Streamable HTTP, stateless. Apps sign in with OAuth (no key to paste); agents and scripts send an API key. Setup for every client: https://github.com/clonvodotcom/mcp. Registry name: `com.clonvo/mcp`.
 
 | Setting | Value |
 | --- | --- |
 | URL | `https://api.clonvo.com/mcp` |
-| Header | `Authorization: Bearer <CLONVO_API_KEY>` |
+| Auth | OAuth sign-in, or `Authorization: Bearer <CLONVO_API_KEY>` |
 
-Claude Code:
+ChatGPT, Claude and other apps with custom connectors: add the URL as a connector and sign in.
+
+Claude Code, signing in (then `/mcp` → **Authenticate**):
+
+```bash
+claude mcp add --transport http clonvo https://api.clonvo.com/mcp
+```
+
+With an API key:
 
 ```bash
 claude mcp add --transport http clonvo https://api.clonvo.com/mcp \
   --header "Authorization: Bearer $CLONVO_API_KEY"
 ```
 
-Project `.mcp.json` (each person sets `CLONVO_API_KEY` themselves):
+Project `.mcp.json` with a key (each person sets `CLONVO_API_KEY` themselves):
 
 ```json
 {
@@ -114,7 +136,9 @@ Project `.mcp.json` (each person sets `CLONVO_API_KEY` themselves):
 }
 ```
 
-Cursor (`.cursor/mcp.json`): same shape without `type`, with `"Bearer ${env:CLONVO_API_KEY}"`.
+Cursor (`.cursor/mcp.json`): `{"mcpServers": {"clonvo": {"url": "https://api.clonvo.com/mcp"}}}` signs in; add `"headers"` with `"Bearer ${env:CLONVO_API_KEY}"` to use a key.
+
+Codex: `codex mcp add clonvo --url https://api.clonvo.com/mcp`, then `codex mcp login clonvo`; or add with `--bearer-token-env-var CLONVO_API_KEY`.
 
 OpenAI Agents SDK (Python), keeping the key in your process:
 
@@ -140,7 +164,7 @@ const clonvo = await createMCPClient({
 const tools = await clonvo.tools(); // pass to generateText / streamText; close() when done
 ```
 
-- A tool problem (bad arguments, no provider, plan, provider failure) comes back as a tool result with `isError: true`, readable by the agent. A bad Clonvo key is an HTTP `401`.
+- A tool problem (bad arguments, no provider, plan, provider failure) comes back as a tool result with `isError: true`, readable by the agent. A bad or missing Clonvo key or OAuth token is an HTTP `401`.
 - Clients that only support the old HTTP+SSE transport, or only local servers, can't connect.
 
 ## Provider routing
