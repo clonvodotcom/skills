@@ -34,7 +34,7 @@ npx skills add clonvodotcom/skills --skill clonvo
 
 ### Claude Code plugin
 
-The plugin installs every skill and connects Clonvo's MCP server (`web_search` and `web_scrape`) using `CLONVO_API_KEY` from your environment:
+The plugin installs every skill and connects [Clonvo's MCP server](https://github.com/clonvodotcom/mcp) (web search, scraping, crawling, research, a browser agent, and company and people data) using `CLONVO_API_KEY` from your environment:
 
 ```
 /plugin marketplace add clonvodotcom/skills
