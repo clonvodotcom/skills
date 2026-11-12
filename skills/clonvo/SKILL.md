@@ -1,25 +1,27 @@
 ---
 name: clonvo
-description: "Build apps and agents on Clonvo, one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models: chat completions, the Responses API, embeddings, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and tools for agents (web search and scraping, crawls, research, a browser agent, company and people data) over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
+description: "Build apps and agents on Clonvo, one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models: chat completions, the Responses API, embeddings, speech to text and text to speech, decision models, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and tools for agents (web search and scraping, crawls, research, a browser agent, company and people data) over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
 metadata:
   author: Clonvo
-  version: "1.1.0"
+  version: "1.2.0"
   docs: "https://clonvo.com/llms.txt"
 ---
 
 # Build with Clonvo
 
-Clonvo is an OpenAI-compatible API in front of OpenAI, Anthropic, Google (Gemini), xAI (Grok), DeepSeek, Mistral, Moonshot (Kimi) and Meta (Muse) models. Code written for the OpenAI SDK works by changing the base URL, the key and the model id. Clonvo translates requests for providers that don't speak OpenAI's format and returns OpenAI-shaped responses.
+Clonvo is an OpenAI-compatible API in front of OpenAI, Anthropic, Google (Gemini), xAI (Grok), DeepSeek, Mistral, Moonshot (Kimi) and Meta (Muse) models, plus Alibaba (Qwen), TypeSafe and Parallel. Code written for the OpenAI SDK works by changing the base URL, the key and the model id. Clonvo translates requests for providers that don't speak OpenAI's format and returns OpenAI-shaped responses.
 
 ## Scope
 
 - Chat Completions: `POST /v1/chat/completions` (the default for new work)
 - Responses API: `POST /v1/responses`, stateless; also runs the OpenAI Agents SDK
 - Embeddings: `POST /v1/embeddings`
+- Audio: `POST /v1/audio/transcriptions` (speech to text) and `POST /v1/audio/speech` (text to speech)
+- Decision models (TypeSafe Jev, Parallel Decisions, Gemini Decision): chat completions with a `json_schema`, answering each field with calibrated probabilities
 - Tools for agents: web search and scraping, site maps and crawls, structured extraction, cited answers, research reports, a browser agent, and company and people data, over REST (`POST /v1/tools/{id}`) or MCP (`https://api.clonvo.com/mcp`, sign in with OAuth or use an API key)
 - Read-only endpoints: `GET /v1/models` (public), `GET /v1/key`, `GET /v1/credits`, `GET /v1/generation?id=`
 
-Not available: OpenAI's Images, Audio, Files, Batch and Assistants APIs (they return `404 unknown_endpoint`).
+Not available: OpenAI's Images, Files, Batch and Assistants APIs, and audio translations and realtime (they return `404 unknown_endpoint`).
 
 ## Setup
 
@@ -85,8 +87,10 @@ Model ids in these examples are real today, but the catalogue changes. Get curre
 4. Picking a model by price, context, or capability (tools, vision, reasoning, structured outputs): query `GET /v1/models`. See [references/models.md](references/models.md).
 5. An agent or LLM needs web search or page reading: Clonvo's web tools, over MCP if the framework speaks it, otherwise REST. See [references/web-tools.md](references/web-tools.md).
 6. Vectors for search or RAG: `/v1/embeddings` with an embedding model. See [references/embeddings.md](references/embeddings.md).
-7. Moving an app from OpenAI or OpenRouter: see the `clonvo-migrate` skill or [references/sdks-and-frameworks.md](references/sdks-and-frameworks.md).
-8. A request failed or cost more than expected: read the error code, then look the request up. See [references/errors.md](references/errors.md).
+7. Transcribing audio or generating speech: `/v1/audio/transcriptions` or `/v1/audio/speech` with an audio model. See [references/audio.md](references/audio.md).
+8. Classifying, routing or scoring text and images cheaply, with probabilities: a decision model. See [references/chat-completions.md](references/chat-completions.md#decision-models).
+9. Moving an app from OpenAI or OpenRouter: see the `clonvo-migrate` skill or [references/sdks-and-frameworks.md](references/sdks-and-frameworks.md).
+10. A request failed or cost more than expected: read the error code, then look the request up. See [references/errors.md](references/errors.md).
 
 ## Critical pitfalls
 
@@ -110,12 +114,13 @@ More: [references/common-mistakes.md](references/common-mistakes.md).
 
 | File | Topics |
 | --- | --- |
-| [references/chat-completions.md](references/chat-completions.md) | Parameters, extensions, response fields, streaming, tool calling, structured outputs, reasoning, images, PDFs and audio, prompt caching |
+| [references/chat-completions.md](references/chat-completions.md) | Parameters, extensions, response fields, streaming, tool calling, structured outputs, decision models, reasoning, images, PDFs and audio, prompt caching |
 | [references/responses-api.md](references/responses-api.md) | Stateless Responses API, conversation replay, function calling, OpenAI Agents SDK |
-| [references/models.md](references/models.md) | Model id format, aliases, free models, `GET /v1/models` fields, choosing by capability and price, peak-hour prices |
+| [references/models.md](references/models.md) | Model id format, aliases, free models, `GET /v1/models` fields and `output_modalities`, choosing by capability and price, peak-hour prices |
 | [references/routing-and-billing.md](references/routing-and-billing.md) | Fallback models, own provider keys, `provider.order`, data collection, cost, credits, spending limits, plans |
 | [references/web-tools.md](references/web-tools.md) | Every tool, `web_search` and `web_scrape` in detail, REST and MCP (OAuth or API key), long-running jobs, giving tools to a model, provider routing, tool errors |
 | [references/embeddings.md](references/embeddings.md) | Embedding models, request and response, dimensions, framework notes |
+| [references/audio.md](references/audio.md) | Transcription and speech models, parameters, voices and formats, audio pricing, audio errors |
 | [references/sdks-and-frameworks.md](references/sdks-and-frameworks.md) | OpenAI Python and Node SDKs, environment variables, Vercel AI SDK, LangChain, OpenRouter-style clients, app attribution |
 | [references/errors.md](references/errors.md) | Error shape, every status and code, retry policy, looking up a request, checking a key and credits |
 | [references/common-mistakes.md](references/common-mistakes.md) | Wrong-to-right corrections for the mistakes agents make most |

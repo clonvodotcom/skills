@@ -13,7 +13,7 @@ They work with any agent that supports skills, including Claude Code, Cursor, Co
 
 | Skill | Use it to |
 | --- | --- |
-| [`clonvo`](skills/clonvo/SKILL.md) | Build with the API: chat completions, the Responses API, embeddings, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, your own provider keys, web tools, errors and billing. |
+| [`clonvo`](skills/clonvo/SKILL.md) | Build with the API: chat completions, the Responses API, embeddings, speech to text and text to speech, decision models, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, your own provider keys, web tools, errors and billing. |
 | [`clonvo-models`](skills/clonvo-models/SKILL.md) | Find, compare and price models from the live catalogue, and resolve a model name to its exact id. |
 | [`clonvo-migrate`](skills/clonvo-migrate/SKILL.md) | Move an app from the OpenAI API or OpenRouter to Clonvo, step by step. |
 | [`clonvo-web-tools`](skills/clonvo-web-tools/SKILL.md) | Search the web and read pages with Clonvo's `web_search` and `web_scrape`, over MCP or REST. |

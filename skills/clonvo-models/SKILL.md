@@ -1,9 +1,9 @@
 ---
 name: clonvo-models
-description: "Find, compare and price the models available on Clonvo from its live catalogue: list models, resolve an informal name to an exact model id, compare prices and context lengths, find the cheapest model with tools, vision, reasoning or structured outputs, list free and embedding models, and check peak-hour pricing. Use when choosing a Clonvo model id, when the user asks which models Clonvo has or what they cost, or before writing a model id into code."
+description: "Find, compare and price the models available on Clonvo from its live catalogue: list models, resolve an informal name to an exact model id, compare prices and context lengths, find the cheapest model with tools, vision, reasoning or structured outputs, list free, embedding, decision, speech and transcription models, and check peak-hour pricing. Use when choosing a Clonvo model id, when the user asks which models Clonvo has or what they cost, or before writing a model id into code."
 metadata:
   author: Clonvo
-  version: "1.0.0"
+  version: "1.1.0"
   docs: "https://clonvo.com/docs/models.md"
 ---
 
@@ -29,6 +29,7 @@ No `jq`? `python3 -c 'import json; …'` over the same file works.
 | Cheapest model that can do X | Filter by capability |
 | Free models | Free models |
 | Embedding models | Embedding models |
+| Decision, speech or transcription models | Other kinds |
 | Details or price windows for one model | One model |
 
 ## List models
@@ -112,6 +113,18 @@ curl -s https://api.clonvo.com/v1/embeddings/models | jq -r '.data[] | [.id, .co
 ```
 
 `dimensions` in `supported_parameters` means the model can shorten its vectors.
+
+## Other kinds
+
+The default list holds chat models only. Ask for others with `output_modalities`, comma-separated or `all`:
+
+```bash
+curl -s "https://api.clonvo.com/v1/models?output_modalities=decisions" | jq -r '.data[] | [.id, .pricing.prompt, .pricing.request] | @tsv'
+curl -s "https://api.clonvo.com/v1/models?output_modalities=transcription" | jq -r '.data[] | [.id, .pricing.prompt] | @tsv'
+curl -s "https://api.clonvo.com/v1/models?output_modalities=speech" | jq -r '.data[] | [.id, .pricing.prompt, (.supported_voices|length)] | @tsv'
+```
+
+Audio `pricing.prompt` is per second of audio (per-minute transcription models) or per character (per-character speech models); token-priced Gemini audio models add `pricing.audio` and `pricing.audio_output`. Multiply by 60 for per minute, or by 1,000,000 for per 1M characters. Decision models charge `pricing.request` per request (Parallel) or input tokens only.
 
 ## One model
 

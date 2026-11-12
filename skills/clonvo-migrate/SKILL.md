@@ -3,7 +3,7 @@ name: clonvo-migrate
 description: "Move an app or agent from the OpenAI API or OpenRouter to Clonvo: find the call sites, swap base URL and key, map model ids, replace features Clonvo doesn't have, translate OpenRouter routing options, and verify with a smoke test. Use when the user wants to switch to Clonvo, use Clonvo instead of OpenAI or OpenRouter, or point existing OpenAI-SDK code at Clonvo."
 metadata:
   author: Clonvo
-  version: "1.0.0"
+  version: "1.1.0"
   docs: "https://clonvo.com/docs/openai-sdks.md"
 ---
 
@@ -19,7 +19,7 @@ Search the codebase for:
 - Keys: `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `sk-or-`
 - Clients: `new OpenAI(`, `OpenAI(`, `AsyncOpenAI(`, `createOpenAI(`, `ChatOpenAI(`, `OpenAIEmbeddings(`, `@openrouter/`
 - Model strings: `"gpt-`, `"o1`, `"o3`, `"o4`, `"claude-`, `"gemini-`, and any `author/slug` ids
-- Endpoints Clonvo doesn't have (step 4): `images.`, `audio.`, `files.`, `batches.`, `beta.assistants`, `beta.threads`, `vector_stores`
+- Endpoints Clonvo doesn't have (step 4): `images.`, `audio.translations`, `realtime`, `files.`, `batches.`, `beta.assistants`, `beta.threads`, `vector_stores`
 
 List them before editing so nothing is missed.
 
@@ -44,7 +44,7 @@ Keep the key in the environment or secret store, and add `CLONVO_API_KEY` to `.e
 Fetch the catalogue once: `curl -s https://api.clonvo.com/v1/models -o /tmp/clonvo-models.json`.
 
 - **From OpenAI**: bare ids become `openai/<slug>`. Check each exists: `jq -r '.data[].id | select(startswith("openai/"))' /tmp/clonvo-models.json`.
-- **From OpenRouter**: ids for OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral, Moonshot and Meta usually work unchanged. Check each one; Clonvo's catalogue covers those eight providers (plus `:free` models), so ids from other authors need a replacement. Ask the user which model to use instead; don't pick silently.
+- **From OpenRouter**: ids for OpenAI, Anthropic, Google, xAI, DeepSeek, Mistral, Moonshot and Meta usually work unchanged. Check each one; Clonvo's catalogue covers those eight providers plus Qwen (and `:free` models), so ids from other authors need a replacement. Ask the user which model to use instead; don't pick silently.
 - **Date-stamped or preview ids** (`…-20260115`, `…-preview`): keep them only if that exact id is in the catalogue (some dated ids are); otherwise use the current catalogue id and tell the user.
 - `:free` ids work only from OpenRouter's current free list, and only after an owner or admin enables free models in **Settings → Privacy**.
 
@@ -54,7 +54,8 @@ Use the `clonvo-models` skill to resolve names and compare prices.
 
 | Feature | On Clonvo |
 | --- | --- |
-| Images, Audio (speech, transcription), Files, Batch, Assistants/Threads, Vector stores | Not available: `404 unknown_endpoint`. Keep those calls on the original provider, and tell the user. |
+| Images, audio translations, Realtime, Files, Batch, Assistants/Threads, Vector stores | Not available: `404 unknown_endpoint`. Keep those calls on the original provider, and tell the user. |
+| `audio.transcriptions`, `audio.speech` | Served. Change the model (`whisper-1`, `gpt-4o-transcribe`, `tts-1` and similar aren't listed) to one from `GET /v1/models?output_modalities=transcription` or `speech`, and the voice to one in its `supported_voices` |
 | `file_id` in messages | Send files inline as base64 `file_data` |
 | `n > 1` | Send separate requests |
 | Responses API state (`previous_response_id`, `conversation`, `store`, `background`) | Stateless. Resend earlier input plus the previous `output` items each turn |

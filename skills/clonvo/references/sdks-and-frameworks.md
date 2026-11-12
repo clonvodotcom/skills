@@ -83,4 +83,4 @@ client = OpenAI(
 
 ## Not available
 
-OpenAI's Images, Audio, Files, Batch and Assistants APIs return `404 unknown_endpoint`. A supported path with the wrong method returns `405 method_not_allowed`.
+OpenAI's Images, Files, Batch and Assistants APIs, and audio translations and realtime, return `404 unknown_endpoint`. Transcriptions and speech are served: see [audio.md](audio.md). A supported path with the wrong method returns `405 method_not_allowed`.

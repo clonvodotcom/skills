@@ -131,6 +131,35 @@ event = json.loads(completion.choices[0].message.content)
 
 Docs: https://clonvo.com/docs/structured-outputs.md
 
+### Decision models
+
+Decision models don't write text: they answer each top-level property of a `json_schema` about the conversation, with calibrated probabilities. List them with `GET /v1/models?output_modalities=decisions` (they aren't in the default list). At the time of writing: `typesafe/jev-1.14.0` and `typesafe/jev-1.13.0` (text, PNG and JPEG), `google/gemini-decision-1` (text and images), and `parallel/decisions-fast` (text plus live web research, priced per request).
+
+| Property | Answer |
+| --- | --- |
+| `string` with `enum`, or `oneOf` of `{const, description}` | The chosen option |
+| `boolean` | `true` when yes is at least 0.5 likely |
+| `number` with `minimum: 0`, `maximum: 1` | The probability of yes |
+| `integer` with `minimum`/`maximum` up to 9 apart | The nearest level |
+| `object` with `top`, `bottom`, `left`, `right` (Jev 1.14 only) | A box in the image, as fractions |
+
+```python
+completion = client.chat.completions.create(
+    model="google/gemini-decision-1",
+    messages=[{"role": "user", "content": "The mug arrived smashed and I want my money back."}],
+    response_format={"type": "json_schema", "json_schema": {"name": "triage", "schema": {"type": "object", "properties": {
+        "team": {"type": "string", "enum": ["billing", "shipping", "technical"], "description": "Which team should handle this?"},
+        "refund": {"type": "boolean", "description": "Is the customer asking for money back?"},
+    }}}},
+)
+json.loads(completion.choices[0].message.content)  # {"team": "shipping", "refund": true}
+```
+
+- Write each `description` as the question. Property names: letters, digits, `_`, `-`.
+- Every request needs a `json_schema`; other property types return `400 unsupported_schema` naming the field.
+- `message.answers` holds each field's `probabilities` and `confidence`: route uncertain cases to a person or a larger model.
+- Parallel also returns `message.citations` and may answer a field `null` with `{"type": "refusal"}`.
+
 ## Reasoning
 
 ```python

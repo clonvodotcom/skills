@@ -12,6 +12,9 @@ Frequent Clonvo integration mistakes, with corrections.
 | A bare upstream id (`claude-sonnet-5-5-20261001`, `gemini-3.8-flash-preview`) | The catalogue id (`anthropic/claude-sonnet-5-5`, `google/gemini-3.8-flash`) |
 | An alias for a free model (`xai/…:free`) | Free ids exactly as listed; aliases don't apply to `:free` |
 | An embedding model in chat completions, or a chat model in `/v1/embeddings` | `400 embedding_model_not_chat` / `model_not_embedding`: use the right endpoint |
+| An audio model in chat completions, or a chat model in `/v1/audio/…` | `400 model_not_chat` / `model_wrong_kind`: transcription and speech models only serve the audio endpoints |
+| OpenAI voice names (`alloy`) with any speech model | A voice from the model's `supported_voices` |
+| A decision model without a `json_schema`, or with free-text string fields | Each property must be an enum, boolean, 0-1 number or small integer range (`400 unsupported_schema`) |
 
 ## Extensions
 

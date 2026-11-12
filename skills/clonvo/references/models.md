@@ -58,7 +58,9 @@ Public (no key), OpenRouter format, cached up to a minute. Prices are USD **per 
 }
 ```
 
-- Chat models only by default. `?output_modalities=embeddings` (or `all`) lists embedding models; so does `GET /v1/embeddings/models`.
+- Chat models only by default (`output_modalities=text`). Other kinds, comma-separated or `all`: `decisions` (decision models), `embeddings` (also `GET /v1/embeddings/models`), `transcription` and `speech`.
+- Speech models list their voices in `supported_voices`.
+- Audio prices follow OpenRouter: for per-minute transcription models `pricing.prompt` is per second of audio, for per-character speech models it's per character. Token-priced audio models add `pricing.audio` (audio input) and `pricing.audio_output`.
 - `GET /v1/models/{author}/{slug}` returns one model (`404 model_not_found` if unknown).
 - Retired and switched-off models aren't listed. Free models are listed with zero prices.
 - Filter client-side; the endpoint has no capability filters besides `output_modalities`.

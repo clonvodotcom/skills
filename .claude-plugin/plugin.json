@@ -1,7 +1,7 @@
 {
   "name": "clonvo",
-  "description": "Skills for Clonvo, one OpenAI-compatible API for every model and tool: building with the API, choosing models, migrating from OpenAI or OpenRouter, and Clonvo's MCP server with web, research, browser, company and people tools",
-  "version": "1.1.0",
+  "description": "Skills for Clonvo, one OpenAI-compatible API for every model and tool: building with the API (chat, embeddings, speech and transcription, decision models), choosing models, migrating from OpenAI or OpenRouter, and Clonvo's MCP server with web, research, browser, company and people tools",
+  "version": "1.2.0",
   "author": {
     "name": "Clonvo",
     "url": "https://clonvo.com"
