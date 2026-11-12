@@ -1,15 +1,15 @@
 ---
 name: clonvo
-description: "Build apps and agents on Clonvo, one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models: chat completions, the Responses API, embeddings, speech to text and text to speech, decision models, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and tools for agents (web search and scraping, crawls, research, a browser agent, company and people data) over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
+description: "Build apps and agents on Clonvo, the AI gateway for agents: one API key for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi, Meta and Qwen models, OpenAI-compatible: chat completions, the Responses API, embeddings, speech to text and text to speech, decision models, streaming, tool calling, structured outputs, reasoning, images and PDFs, fallback models, bring-your-own-key routing, and tools for agents (web search and scraping, crawls, research, a browser agent, company and people data) over REST or MCP. Use when writing or debugging code that calls Clonvo, when the user mentions Clonvo, CLONVO_API_KEY, api.clonvo.com or an sk-cv-v1- key, or wants one API key for many LLM providers with fallbacks."
 metadata:
   author: Clonvo
-  version: "1.2.0"
+  version: "1.2.1"
   docs: "https://clonvo.com/llms.txt"
 ---
 
 # Build with Clonvo
 
-Clonvo is an OpenAI-compatible API in front of OpenAI, Anthropic, Google (Gemini), xAI (Grok), DeepSeek, Mistral, Moonshot (Kimi) and Meta (Muse) models, plus Alibaba (Qwen), TypeSafe and Parallel. Code written for the OpenAI SDK works by changing the base URL, the key and the model id. Clonvo translates requests for providers that don't speak OpenAI's format and returns OpenAI-shaped responses.
+Clonvo is an AI gateway for agents: one API in front of OpenAI, Anthropic, Google (Gemini), xAI (Grok), DeepSeek, Mistral, Moonshot (Kimi), Meta (Muse), Alibaba (Qwen), TypeSafe and Parallel models, plus web, company and people tools. Code written for the OpenAI SDK works by changing the base URL, the key and the model id. Clonvo translates requests for providers that don't speak OpenAI's format and returns OpenAI-shaped responses.
 
 ## Scope
 

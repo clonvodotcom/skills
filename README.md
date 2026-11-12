@@ -2,7 +2,7 @@
 
 [![skills.sh](https://skills.sh/b/clonvodotcom/skills)](https://skills.sh/clonvodotcom/skills)
 
-[Agent Skills](https://agentskills.io) for [Clonvo](https://clonvo.com), one OpenAI-compatible API for OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi and Meta models, with fallbacks, your own provider keys, and tools for agents: web search and scraping, crawls, research, a browser agent, and company and people data.
+[Agent Skills](https://agentskills.io) for [Clonvo](https://clonvo.com), the AI gateway for agents: 150+ models from OpenAI, Anthropic, Google Gemini, xAI Grok, DeepSeek, Mistral, Kimi, Meta and Qwen, plus web search and scraping, crawls, research, a browser agent, and company and people data, on one API key. With fallbacks, your own provider keys, and the OpenAI SDKs you already use.
 
 They work with any agent that supports skills, including Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, Windsurf and OpenCode.
 

@@ -10,7 +10,7 @@
     {
       "name": "clonvo",
       "source": "./",
-      "description": "Skills for Clonvo, one OpenAI-compatible API for every model and tool"
+      "description": "Skills for Clonvo, the AI gateway for agents"
     }
   ]
 }
